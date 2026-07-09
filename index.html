@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InventoryOptimizer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>InventoryOptimizer</h1>
+    <p>Sistema de Inventario &mdash; Migración SQL → MongoDB</p>
+    <p id="fecha"></p>
+  </header>
+
+  <main>
+
+    <!-- RESUMEN GENERAL -->
+    <section class="contenedor">
+      <h2>Resumen General</h2>
+      <div class="cards">
+        <div class="card">
+          <h3 id="statProductos">10</h3>
+          <p>Productos</p>
+        </div>
+        <div class="card">
+          <h3 id="statInventarios">15</h3>
+          <p>Inventarios</p>
+        </div>
+        <div class="card">
+          <h3 id="statTransacciones">20</h3>
+          <p>Transacciones</p>
+        </div>
+        <div class="card">
+          <h3>5</h3>
+          <p>Sucursales</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGREGAR PRODUCTO (CREATE) -->
+    <section class="contenedor">
+      <h2>Agregar Producto</h2>
+      <form id="formProducto" class="formulario">
+        <input id="nombre" placeholder="Nombre" required>
+        <input id="categoria" placeholder="Categoría" required>
+        <input id="stock" type="number" min="0" placeholder="Stock" required>
+        <button type="submit">Agregar</button>
+      </form>
+    </section>
+
+    <!-- BUSCAR PRODUCTO -->
+    <section class="contenedor">
+      <h2>Buscar Producto</h2>
+      <input
+        id="busqueda"
+        class="input-busqueda"
+        placeholder="Buscar por nombre o categoría..."
+        onkeyup="buscarProducto()"
+      >
+    </section>
+
+    <!-- TABLA DE PRODUCTOS (READ / UPDATE / DELETE) -->
+    <section class="contenedor">
+      <h2>Productos (CRUD)</h2>
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th>Stock</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaProductos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- INVENTARIO POR SUCURSAL -->
+    <section class="contenedor">
+      <h2>Inventario Actual por Sucursal</h2>
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Sucursal</th>
+              <th>Producto</th>
+              <th>Disponible</th>
+              <th>Reservado</th>
+              <th>En Tránsito</th>
+              <th>Últ. Recuento</th>
+            </tr>
+          </thead>
+          <tbody id="tablaInventario"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- OPERACIONES CRUD (documentación) -->
+    <section class="contenedor">
+      <h2>Operaciones CRUD implementadas</h2>
+      <ul class="lista-crud">
+        <li><strong>Create</strong> → Agregar productos e insertar transacciones (<code>insertMany</code>, <code>$push</code>)</li>
+        <li><strong>Read</strong> → Mostrar productos e inventario, búsquedas avanzadas</li>
+        <li><strong>Update</strong> → Actualizar stock disponible (<code>$set</code>)</li>
+        <li><strong>Delete</strong> → Eliminar productos y transacciones de ajuste (<code>$pull</code>)</li>
+      </ul>
+    </section>
+
+    <!-- CONSULTAS MONGODB -->
+    <section class="contenedor">
+      <h2>Consultas MongoDB destacadas</h2>
+      <ul class="lista-consultas">
+        <li>Productos de categoría <em>lácteos</em> (3 resultados)</li>
+        <li>Inventarios con <code>cantidad_disponible &gt; 30</code></li>
+        <li>Todos los productos de la Sucursal Centro (5 SKUs)</li>
+        <li><code>$elemMatch</code> sobre transacciones tipo <em>entrada</em></li>
+        <li>Validación de integridad referencial sucursal/producto</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Proyecto InventoryOptimizer &mdash; Dantes Burgos</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

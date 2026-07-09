@@ -1,0 +1,194 @@
+:root {
+  --azul: #0066cc;
+  --azul-oscuro: #004a99;
+  --fondo: #f0f2f5;
+  --texto: #1c1c1c;
+  --gris-borde: #dfe3e8;
+  --verde: #1c8a44;
+  --rojo: #c0392b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  margin: 0;
+}
+
+header {
+  background: var(--azul);
+  color: white;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0 0 6px 0;
+}
+
+header p {
+  margin: 2px 0;
+  opacity: 0.9;
+}
+
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 10px 0 30px 0;
+}
+
+.contenedor {
+  background: white;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.contenedor h2 {
+  margin-top: 0;
+  color: var(--azul-oscuro);
+  border-bottom: 2px solid var(--gris-borde);
+  padding-bottom: 8px;
+}
+
+/* --- Cards de resumen --- */
+.cards {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: var(--azul);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 130px;
+  flex: 1;
+  text-align: center;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.card p {
+  margin: 4px 0 0 0;
+  opacity: 0.9;
+}
+
+/* --- Formulario --- */
+.formulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+input {
+  padding: 10px;
+  border: 1px solid var(--gris-borde);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.formulario input {
+  flex: 1;
+  min-width: 140px;
+}
+
+.input-busqueda {
+  width: 100%;
+}
+
+button {
+  padding: 10px 18px;
+  background: var(--azul);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.15s ease;
+}
+
+button:hover {
+  background: var(--azul-oscuro);
+}
+
+button.btn-eliminar {
+  background: var(--rojo);
+}
+
+button.btn-eliminar:hover {
+  background: #932a1f;
+}
+
+/* --- Tablas --- */
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 480px;
+}
+
+table, th, td {
+  border: 1px solid var(--gris-borde);
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+thead th {
+  background: #f5f7fa;
+}
+
+tbody tr:hover {
+  background: #f9fbfd;
+}
+
+.stock-bajo {
+  color: var(--rojo);
+  font-weight: bold;
+}
+
+/* --- Listas --- */
+.lista-crud,
+.lista-consultas {
+  line-height: 1.8;
+}
+
+.lista-crud code,
+.lista-consultas code {
+  background: #eef2f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+footer {
+  background: var(--azul);
+  color: white;
+  text-align: center;
+  padding: 18px;
+  margin-top: 10px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .formulario {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
