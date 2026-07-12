@@ -8,126 +8,129 @@
 </head>
 <body>
 
-  <header>
-    <h1>InventoryOptimizer</h1>
-    <p>Sistema de Inventario &mdash; Migración SQL → MongoDB</p>
-    <p id="fecha"></p>
-  </header>
+  <!-- ============================= -->
+  <!-- PANTALLA DE LOGIN -->
+  <!-- ============================= -->
+  <div id="pantallaLogin" class="login-pantalla">
+    <form id="formLogin" class="login-caja">
+      <h1>InventoryOptimizer</h1>
+      <p class="login-subtitulo">Ingresa con tu usuario para continuar</p>
 
-  <main>
+      <input id="loginUsuario" placeholder="Usuario" autocomplete="username" required>
+      <input id="loginPassword" type="password" placeholder="Contraseña" autocomplete="current-password" required>
 
-    <!-- RESUMEN GENERAL -->
-    <section class="contenedor">
-      <h2>Resumen General</h2>
-      <div class="cards">
-        <div class="card">
-          <h3 id="statProductos">10</h3>
-          <p>Productos</p>
+      <button type="submit">Ingresar</button>
+      <p id="loginError" class="login-error"></p>
+    </form>
+  </div>
+
+  <!-- ============================= -->
+  <!-- APP PRINCIPAL (oculta hasta hacer login) -->
+  <!-- ============================= -->
+  <div id="appRoot" style="display:none">
+
+    <header>
+      <h1>InventoryOptimizer</h1>
+      <p id="infoUsuario"></p>
+      <button id="btnLogout" class="btn-logout">Cerrar sesión</button>
+    </header>
+
+    <main>
+
+      <!-- RESUMEN GENERAL: gerente + administrador -->
+      <section class="contenedor" data-roles="gerente,administrador">
+        <h2>Resumen General</h2>
+        <div class="cards">
+          <div class="card"><h3 id="statProductos">-</h3><p>Productos</p></div>
+          <div class="card"><h3 id="statInventarios">-</h3><p>Inventarios</p></div>
+          <div class="card"><h3 id="statTransacciones">-</h3><p>Transacciones</p></div>
+          <div class="card"><h3>5</h3><p>Sucursales</p></div>
         </div>
-        <div class="card">
-          <h3 id="statInventarios">15</h3>
-          <p>Inventarios</p>
+      </section>
+
+      <!-- GANANCIAS POR SUCURSAL: solo gerente + administrador -->
+      <section class="contenedor" data-roles="gerente,administrador">
+        <h2>Ingresos por Sucursal</h2>
+        <p class="nota">Calculado como cantidad vendida (transacciones tipo "salida") &times; precio de venta.</p>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Sucursal</th><th>Ingresos Totales</th></tr></thead>
+            <tbody id="tablaGanancias"></tbody>
+          </table>
         </div>
-        <div class="card">
-          <h3 id="statTransacciones">20</h3>
-          <p>Transacciones</p>
+      </section>
+
+      <!-- INVENTARIO POR SUCURSAL: gerente + administrador -->
+      <section class="contenedor" data-roles="gerente,administrador">
+        <h2>Inventario Actual por Sucursal</h2>
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Sucursal</th><th>Producto</th><th>Disponible</th>
+                <th>Reservado</th><th>En Tránsito</th><th>Últ. Recuento</th>
+              </tr>
+            </thead>
+            <tbody id="tablaInventario"></tbody>
+          </table>
         </div>
-        <div class="card">
-          <h3>5</h3>
-          <p>Sucursales</p>
+      </section>
+
+      <!-- TRANSACCIONES: gerente + administrador -->
+      <section class="contenedor" data-roles="gerente,administrador">
+        <h2>Transacciones</h2>
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr><th>Fecha</th><th>Sucursal</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th></tr>
+            </thead>
+            <tbody id="tablaTransacciones"></tbody>
+          </table>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- AGREGAR PRODUCTO (CREATE) -->
-    <section class="contenedor">
-      <h2>Agregar Producto</h2>
-      <form id="formProducto" class="formulario">
-        <input id="nombre" placeholder="Nombre" required>
-        <input id="categoria" placeholder="Categoría" required>
-        <input id="stock" type="number" min="0" placeholder="Stock" required>
-        <button type="submit">Agregar</button>
-      </form>
-    </section>
+      <!-- MAPA DE REPOSICIÓN: solo reponedor -->
+      <section class="contenedor" data-roles="reponedor">
+        <h2>Mapa de tu Sucursal</h2>
+        <p class="nota">Las zonas en rojo tienen productos bajo el stock mínimo: hay que reponer.</p>
+        <div id="mapaSucursal"></div>
+        <div id="listaAlertas" class="lista-alertas"></div>
+      </section>
 
-    <!-- BUSCAR PRODUCTO -->
-    <section class="contenedor">
-      <h2>Buscar Producto</h2>
-      <input
-        id="busqueda"
-        class="input-busqueda"
-        placeholder="Buscar por nombre o categoría..."
-        onkeyup="buscarProducto()"
-      >
-    </section>
+      <!-- AGREGAR PRODUCTO (catálogo): solo administrador -->
+      <section class="contenedor" data-roles="administrador">
+        <h2>Agregar Producto (catálogo)</h2>
+        <form id="formProducto" class="formulario">
+          <input id="nombre" placeholder="Nombre" required>
+          <input id="categoria" placeholder="Categoría" required>
+          <input id="stock" type="number" min="0" placeholder="Stock mínimo" required>
+          <button type="submit">Agregar</button>
+        </form>
+      </section>
 
-    <!-- TABLA DE PRODUCTOS (READ / UPDATE / DELETE) -->
-    <section class="contenedor">
-      <h2>Productos (CRUD)</h2>
-      <div class="tabla-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>SKU</th>
-              <th>Nombre</th>
-              <th>Categoría</th>
-              <th>Stock</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tablaProductos"></tbody>
-        </table>
-      </div>
-    </section>
+      <!-- BUSCAR PRODUCTO: solo administrador -->
+      <section class="contenedor" data-roles="administrador">
+        <h2>Buscar Producto</h2>
+        <input id="busqueda" class="input-busqueda" placeholder="Buscar por nombre o categoría..." onkeyup="buscarProducto()">
+      </section>
 
-    <!-- INVENTARIO POR SUCURSAL -->
-    <section class="contenedor">
-      <h2>Inventario Actual por Sucursal</h2>
-      <div class="tabla-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Sucursal</th>
-              <th>Producto</th>
-              <th>Disponible</th>
-              <th>Reservado</th>
-              <th>En Tránsito</th>
-              <th>Últ. Recuento</th>
-            </tr>
-          </thead>
-          <tbody id="tablaInventario"></tbody>
-        </table>
-      </div>
-    </section>
+      <!-- TABLA DE PRODUCTOS (CRUD catálogo): solo administrador -->
+      <section class="contenedor" data-roles="administrador">
+        <h2>Productos (CRUD)</h2>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>SKU</th><th>Nombre</th><th>Categoría</th><th>Stock</th><th>Acciones</th></tr></thead>
+            <tbody id="tablaProductos"></tbody>
+          </table>
+        </div>
+      </section>
 
-    <!-- OPERACIONES CRUD (documentación) -->
-    <section class="contenedor">
-      <h2>Operaciones CRUD implementadas</h2>
-      <ul class="lista-crud">
-        <li><strong>Create</strong> → Agregar productos e insertar transacciones (<code>insertMany</code>, <code>$push</code>)</li>
-        <li><strong>Read</strong> → Mostrar productos e inventario, búsquedas avanzadas</li>
-        <li><strong>Update</strong> → Actualizar stock disponible (<code>$set</code>)</li>
-        <li><strong>Delete</strong> → Eliminar productos y transacciones de ajuste (<code>$pull</code>)</li>
-      </ul>
-    </section>
+    </main>
 
-    <!-- CONSULTAS MONGODB -->
-    <section class="contenedor">
-      <h2>Consultas MongoDB destacadas</h2>
-      <ul class="lista-consultas">
-        <li>Productos de categoría <em>lácteos</em> (3 resultados)</li>
-        <li>Inventarios con <code>cantidad_disponible &gt; 30</code></li>
-        <li>Todos los productos de la Sucursal Centro (5 SKUs)</li>
-        <li><code>$elemMatch</code> sobre transacciones tipo <em>entrada</em></li>
-        <li>Validación de integridad referencial sucursal/producto</li>
-      </ul>
-    </section>
-
-  </main>
-
-  <footer>
-    <p>Proyecto InventoryOptimizer &mdash; Dantes Burgos</p>
-  </footer>
+    <footer>
+      <p>Proyecto InventoryOptimizer &mdash; Dantes Burgos</p>
+    </footer>
+  </div>
 
   <script src="app.js"></script>
 </body>
