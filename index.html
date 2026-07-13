@@ -9,12 +9,24 @@
 <body>
 
   <!-- ============================= -->
-  <!-- PANTALLA DE LOGIN -->
+  <!-- LOGIN -->
   <!-- ============================= -->
   <div id="pantallaLogin" class="login-pantalla">
     <form id="formLogin" class="login-caja">
       <h1>InventoryOptimizer</h1>
-      <p class="login-subtitulo">Ingresa con tu usuario para continuar</p>
+      <p class="login-subtitulo">Ingresa tus datos para marcar tu entrada</p>
+
+      <input id="loginNombre" placeholder="Nombre" required>
+      <input id="loginApellido" placeholder="Apellido" required>
+
+      <select id="loginSucursal" required>
+        <option value="">-- Selecciona tu sucursal --</option>
+        <option value="1">1 - Sucursal Centro</option>
+        <option value="2">2 - Sucursal Sur</option>
+        <option value="3">3 - Sucursal Norte</option>
+        <option value="4">4 - Sucursal Valparaíso</option>
+        <option value="5">5 - Sucursal Concepción</option>
+      </select>
 
       <input id="loginUsuario" placeholder="Usuario" autocomplete="username" required>
       <input id="loginPassword" type="password" placeholder="Contraseña" autocomplete="current-password" required>
@@ -25,19 +37,19 @@
   </div>
 
   <!-- ============================= -->
-  <!-- APP PRINCIPAL (oculta hasta hacer login) -->
+  <!-- APP -->
   <!-- ============================= -->
   <div id="appRoot" style="display:none">
 
     <header>
       <h1>InventoryOptimizer</h1>
       <p id="infoUsuario"></p>
-      <button id="btnLogout" class="btn-logout">Cerrar sesión</button>
+      <button id="btnLogout" class="btn-logout">Marcar salida y cerrar sesión</button>
     </header>
 
     <main>
 
-      <!-- RESUMEN GENERAL: gerente + administrador -->
+      <!-- ===== GERENTE / ADMINISTRADOR ===== -->
       <section class="contenedor" data-roles="gerente,administrador">
         <h2>Resumen General</h2>
         <div class="cards">
@@ -48,10 +60,19 @@
         </div>
       </section>
 
-      <!-- GANANCIAS POR SUCURSAL: solo gerente + administrador -->
+      <section class="contenedor" data-roles="gerente,administrador">
+        <h2>Asistencia del Día</h2>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Nombre</th><th>Apellido</th><th>Rol</th><th>Sucursal</th><th>Entrada</th><th>Salida</th><th>Estado</th></tr></thead>
+            <tbody id="tablaAsistencia"></tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="contenedor" data-roles="gerente,administrador">
         <h2>Ingresos por Sucursal</h2>
-        <p class="nota">Calculado como cantidad vendida (transacciones tipo "salida") &times; precio de venta.</p>
+        <p class="nota">Suma de ventas (transacciones tipo "salida") &times; precio de venta.</p>
         <div class="tabla-scroll">
           <table>
             <thead><tr><th>Sucursal</th><th>Ingresos Totales</th></tr></thead>
@@ -60,44 +81,86 @@
         </div>
       </section>
 
-      <!-- INVENTARIO POR SUCURSAL: gerente + administrador -->
       <section class="contenedor" data-roles="gerente,administrador">
         <h2>Inventario Actual por Sucursal</h2>
         <div class="tabla-scroll">
           <table>
-            <thead>
-              <tr>
-                <th>Sucursal</th><th>Producto</th><th>Disponible</th>
-                <th>Reservado</th><th>En Tránsito</th><th>Últ. Recuento</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Sucursal</th><th>Producto</th><th>Disponible</th><th>Reservado</th><th>En Tránsito</th><th>Últ. Recuento</th></tr></thead>
             <tbody id="tablaInventario"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- TRANSACCIONES: gerente + administrador -->
       <section class="contenedor" data-roles="gerente,administrador">
         <h2>Transacciones</h2>
         <div class="tabla-scroll">
           <table>
-            <thead>
-              <tr><th>Fecha</th><th>Sucursal</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th></tr>
-            </thead>
+            <thead><tr><th>Fecha</th><th>Sucursal</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th></tr></thead>
             <tbody id="tablaTransacciones"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- MAPA DE REPOSICIÓN: solo reponedor -->
+      <!-- ===== REPONEDOR ===== -->
       <section class="contenedor" data-roles="reponedor">
         <h2>Mapa de tu Sucursal</h2>
-        <p class="nota">Las zonas en rojo tienen productos bajo el stock mínimo: hay que reponer.</p>
+        <p class="nota">Rojo = bajo stock mínimo. Naranjo = tarea asignada por el inspector.</p>
         <div id="mapaSucursal"></div>
+        <h3>Alertas automáticas de stock</h3>
         <div id="listaAlertas" class="lista-alertas"></div>
+        <h3>Tareas del inspector</h3>
+        <div id="listaTareas" class="lista-alertas"></div>
       </section>
 
-      <!-- AGREGAR PRODUCTO (catálogo): solo administrador -->
+      <!-- ===== CAJERO ===== -->
+      <section class="contenedor" data-roles="cajero">
+        <h2>Registrar Venta</h2>
+        <form id="formVenta" class="formulario">
+          <select id="ventaProducto" required></select>
+          <input id="ventaCantidad" type="number" min="1" placeholder="Cantidad" required>
+          <input id="ventaComprobante" placeholder="N° de comprobante" required>
+          <button type="submit">Registrar venta</button>
+        </form>
+        <p id="ventaError" class="login-error"></p>
+      </section>
+
+      <section class="contenedor" data-roles="cajero">
+        <h2>Ventas registradas hoy (tu sucursal)</h2>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Hora</th><th>Producto</th><th>Cant.</th><th>Total</th><th>Comprobante</th></tr></thead>
+            <tbody id="tablaVentas"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== SEGURIDAD ===== -->
+      <section class="contenedor" data-roles="seguridad">
+        <h2>Mapa de Vigilancia</h2>
+        <p class="nota" id="zonaAsignadaTexto">Cargando tu zona asignada...</p>
+        <div id="mapaSeguridad"></div>
+      </section>
+
+      <!-- ===== INSPECTOR ===== -->
+      <section class="contenedor" data-roles="inspector">
+        <h2>Inspección de Inventario</h2>
+        <select id="inspectorSucursal">
+          <option value="1">Sucursal Centro</option>
+          <option value="2">Sucursal Sur</option>
+          <option value="3">Sucursal Norte</option>
+          <option value="4">Sucursal Valparaíso</option>
+          <option value="5">Sucursal Concepción</option>
+        </select>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Producto</th><th>Disponible</th><th>Mínimo</th><th>Acción</th></tr></thead>
+            <tbody id="tablaInspeccion"></tbody>
+          </table>
+        </div>
+        <p id="inspeccionMensaje" class="login-error"></p>
+      </section>
+
+      <!-- ===== ADMINISTRADOR (catálogo) ===== -->
       <section class="contenedor" data-roles="administrador">
         <h2>Agregar Producto (catálogo)</h2>
         <form id="formProducto" class="formulario">
@@ -108,13 +171,11 @@
         </form>
       </section>
 
-      <!-- BUSCAR PRODUCTO: solo administrador -->
       <section class="contenedor" data-roles="administrador">
         <h2>Buscar Producto</h2>
         <input id="busqueda" class="input-busqueda" placeholder="Buscar por nombre o categoría..." onkeyup="buscarProducto()">
       </section>
 
-      <!-- TABLA DE PRODUCTOS (CRUD catálogo): solo administrador -->
       <section class="contenedor" data-roles="administrador">
         <h2>Productos (CRUD)</h2>
         <div class="tabla-scroll">
@@ -127,9 +188,7 @@
 
     </main>
 
-    <footer>
-      <p>Proyecto InventoryOptimizer &mdash; Dantes Burgos</p>
-    </footer>
+    <footer><p>Proyecto InventoryOptimizer &mdash; Dantes Burgos</p></footer>
   </div>
 
   <script src="app.js"></script>
